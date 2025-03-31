@@ -1,19 +1,20 @@
-# Lambda Java com URL Pré-assinada do S3 🚀
+# AWS Lambda com Autenticação Cognito 🚀
 
 ## 📘 Visão Geral
-Este repositório contém uma função AWS Lambda escrita em **Java**, empacotada com **Docker**, que gera uma **URL pré-assinada (presigned URL)** para upload seguro de arquivos no Amazon S3.
+Este repositório contém uma função AWS Lambda escrita em **Java**, empacotada com **Docker**, que gerencia autenticação de usuários usando **Amazon Cognito**.
 
-Essa função é usada no contexto do Hackaton da FIAP para viabilizar uploads diretos ao S3 sem expor credenciais ou abrir o bucket publicamente. A Lambda é exposta por meio do **API Gateway**, permitindo que frontends ou clientes façam upload de forma segura e escalável.
+Essa função é usada no contexto do Hackaton da FIAP para viabilizar autenticação e autorização segura de usuários. A Lambda é exposta por meio do **API Gateway**, permitindo que frontends ou clientes autentiquem usuários de forma segura e escalável.
 
 ---
 
-## 🔐 Por que usar URL Pré-assinada?
+## 🔐 Por que usar Autenticação com Cognito?
 
-A **URL pré-assinada** permite que um cliente envie (PUT) ou baixe (GET) um arquivo diretamente para o S3 com permissão temporária, sem precisar da chave de acesso da AWS. Essa abordagem oferece:
+O **Amazon Cognito** oferece um serviço robusto de autenticação com:
 
-- ✅ **Segurança**: A URL expira após alguns minutos e é limitada a uma operação (ex: upload).
-- ✅ **Redução de Carga na API**: O arquivo não passa pelo backend; vai direto ao S3.
-- ✅ **Controle**: Permite restringir o tamanho máximo do arquivo e o path de destino.
+- ✅ **Segurança**: Autenticação e autorização com padrões da indústria
+- ✅ **Escalabilidade**: Gerencia milhões de usuários com gestão integrada
+- ✅ **Flexibilidade**: Suporta múltiplos fluxos de autenticação e provedores de identidade
+- ✅ **Conformidade**: Ajuda a atender requisitos de segurança e privacidade
 
 ---
 
@@ -21,19 +22,19 @@ A **URL pré-assinada** permite que um cliente envie (PUT) ou baixe (GET) um arq
 
 Embora a AWS Lambda suporte múltiplas linguagens, o Java traz os seguintes benefícios:
 
-- 🔒 **Tipagem forte**: Menor risco de erros em tempo de execução.
-- 🧰 **Ecossistema maduro**: Acesso a bibliotecas corporativas e ferramentas como Maven e Spring.
-- ⚙️ **Performance consistente**: Especialmente útil em workloads computacionais mais pesados.
-- 📦 **Empacotamento com Docker**: Evita os problemas de cold start e permite configurar o ambiente com mais controle.
+- 🔒 **Tipagem forte**: Menor risco de erros em tempo de execução
+- 🧰 **Ecossistema maduro**: Acesso a bibliotecas corporativas e ferramentas como Maven e Spring
+- ⚙️ **Performance consistente**: Especialmente útil em workloads computacionais mais pesados
+- 📦 **Empacotamento com Docker**: Evita problemas de cold start e permite melhor controle do ambiente
 
 ---
 
 ## 🐳 Vantagens de rodar Lambda com Docker
 
-- 📦 **Ambiente personalizado**: Controle total sobre bibliotecas, runtime e dependências.
-- 💼 **Adoção corporativa**: Ideal para equipes que já utilizam Java e Docker.
-- 🧪 **Testabilidade**: Pode ser testado localmente com `sam local` ou `docker run`.
-- 🔁 **Portabilidade**: O mesmo container pode ser usado em outros ambientes (ECS, Fargate, etc).
+- 📦 **Ambiente personalizado**: Controle total sobre bibliotecas, runtime e dependências
+- 💼 **Adoção corporativa**: Ideal para equipes que já utilizam Java e Docker
+- 🧪 **Testabilidade**: Pode ser testado localmente com `sam local` ou `docker run`
+- 🔁 **Portabilidade**: O mesmo container pode ser usado em outros ambientes (ECS, Fargate, etc)
 
 ---
 
@@ -41,31 +42,31 @@ Embora a AWS Lambda suporte múltiplas linguagens, o Java traz os seguintes bene
 
 ```bash
 .
-└── HackatonFiapPresignedUrl/
+└── HackatonFiapCognitoAuth/
     └── src/
         └── Dockerfile               # Define imagem Java 21 com Lambda
-        └── pom.xml                  # Build Maven com dependências AWS
-        └── main/java/presignedUrl/
+        └── pom.xml                 # Build Maven com dependências AWS
+        └── main/java/auth/
             └── LambdaHandler.java  # Código Java principal
-```
 
 ---
 
 ## 🔄 Fluxo de Funcionamento
 
-1. O frontend faz uma requisição HTTP (GET ou POST) ao endpoint da Lambda via API Gateway.
-2. A Lambda gera uma URL pré-assinada válida por 10 minutos.
-3. O frontend faz o upload diretamente para o S3 usando essa URL (método PUT).
-4. Um evento S3 pode acionar outra Lambda para processar o arquivo.
+1. O frontend faz uma requisição HTTP POST ao endpoint da Lambda via API Gateway.
+2. A Lambda valida credenciais contra o pool de usuários do Cognito
+3. Se bem-sucedido, retorna o JWT
+
 
 ---
 
 ## 📎 Exemplo de Resposta JSON
 ```json
 {
-  "url": "https://bucket-fiap-hackaton.s3.amazonaws.com/e-mail/uuid",
-  "fileKey": "e-mail/uuid",
-  "maxFileSize": 10485760
+  "AccessToken": "eyJz9sdfn....",
+  "IdToken": "eyJ0eXAiOi...",
+  "RefreshToken": "eyJjdHkiOi...",
+  "ExpiresIn": 3600
 }
 ```
 
@@ -163,4 +164,3 @@ sam deploy --guided
 ## ✉️ Contato
 Para dúvidas ou sugestões, entre em contato com o time técnico responsável pelo Hackaton FIAP.
 
-# hackathon-fiap-cognito-auth
