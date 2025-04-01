@@ -43,7 +43,7 @@ jobs:
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
   push-ecr:
-    name: Build and Push docker image to ECR
+    name: Build&Push Image
     needs: sonar-analysis
     runs-on: ubuntu-latest
     environment: staging
@@ -66,7 +66,7 @@ jobs:
           aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY }} || \
           echo "Repository already exists, continuing..."
 
-      - name: Build&Push DockerImage
+      - name: Build and push Docker image into ECR
         working-directory: ./HackathonFiapCognitoAuth
         run: |
           VERSION_TAG=$(date +'%Y%m%d').${{ github.run_number }}
