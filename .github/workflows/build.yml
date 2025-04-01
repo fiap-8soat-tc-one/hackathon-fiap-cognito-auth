@@ -17,7 +17,7 @@ env:
 
 jobs:
   sonar-analysis:
-    name: Sonar Analysis
+    name: Run Sonar Analysis
     runs-on: ubuntu-latest
     environment: staging
 
@@ -42,8 +42,8 @@ jobs:
             -Dsonar.projectKey=fiap-8soat-tc-one_hackathon-fiap-cognito-auth \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
-  deploy-ecr:
-    name: Deploy to ECR
+  push-ecr:
+    name: Build and Push docker image to ECR
     needs: sonar-analysis
     runs-on: ubuntu-latest
     environment: staging
@@ -61,6 +61,7 @@ jobs:
         id: login-ecr
 
       - name: Build and push Docker image
+        working-directory: ./HackathonFiapCognitoAuth
         run: |
           VERSION_TAG=$(date +'%Y%m%d').${{ github.run_number }}
           
