@@ -38,7 +38,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify sonar:sonar \
-            -Dsonar.projectKey=fiap-8soat-hackathon-cognite \
+            -Dsonar.projectKey=fiap-8soat-tc-one_hackathon-fiap-cognito-auth \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
   deploy-ecr:
