@@ -24,19 +24,16 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         try {
-            // Parse the request body
             Map<String, String> body = parseJsonBody(event.getBody());
             String email = body.get("email");
             String senha = body.get("senha");
 
-            // Validate email and senha
             if (email == null || senha == null) {
                 response.setStatusCode(400);
                 response.setBody("{\"message\": \"Email e senha são obrigatórios.\"}");
                 return response;
             }
 
-            // Prepare parameters for the Cognito request
             Map<String, String> authParams = new HashMap<>();
             authParams.put("USERNAME", email); // Cognito configurado para validar por e-mail
             authParams.put("PASSWORD", senha);
@@ -46,14 +43,10 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
                     .withClientId("aiikv53cphpca7r6plv0vilec")
                     .withAuthParameters(authParams);
 
-            // Call Cognito to authenticate
             InitiateAuthResult authResult = cognitoClient.initiateAuth(authRequest);
 
-            // Prepare the response
             Map<String, String> responseBody = new HashMap<>();
-            responseBody.put("access_token", authResult.getAuthenticationResult().getAccessToken());
             responseBody.put("id_token", authResult.getAuthenticationResult().getIdToken());
-            responseBody.put("refresh_token", authResult.getAuthenticationResult().getRefreshToken());
             responseBody.put("expires_in", String.valueOf(authResult.getAuthenticationResult().getExpiresIn()));
 
             response.setStatusCode(200);
@@ -61,9 +54,6 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
         } catch (InvalidParameterException | NotAuthorizedException e) {
             response.setStatusCode(401);
             response.setBody("{\"message\": \"Falha na autenticação\", \"error\": \"" + e.getMessage() + "\"}");
-        } catch (InternalErrorException e) {
-            response.setStatusCode(500);
-            response.setBody("{\"message\": \"Erro interno no servidor\", \"error\": \"" + e.getMessage() + "\"}");
         } catch (Exception e) {
             response.setStatusCode(500);
             response.setBody("{\"message\": \"Erro na autenticação\", \"error\": \"" + e.getMessage() + "\"}");
