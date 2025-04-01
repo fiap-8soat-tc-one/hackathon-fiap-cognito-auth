@@ -1,5 +1,9 @@
 # AWS Lambda com Autenticação Cognito 🚀
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=fiap-8soat-tc-one_hackathon-fiap-cognito-auth&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=fiap-8soat-tc-one_hackathon-fiap-cognito-auth)
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=fiap-8soat-tc-one_hackathon-fiap-cognito-auth)
+[![Build and Publish image to ECR](https://github.com/fiap-8soat-tc-one/hackathon-fiap-cognito-auth/actions/workflows/build.yml/badge.svg)](https://github.com/fiap-8soat-tc-one/hackathon-fiap-cognito-auth/actions/workflows/build.yml)
+
 ## 📘 Visão Geral
 Este repositório contém uma função AWS Lambda escrita em **Java**, empacotada com **Docker**, que gerencia autenticação de usuários usando **Amazon Cognito**.
 
