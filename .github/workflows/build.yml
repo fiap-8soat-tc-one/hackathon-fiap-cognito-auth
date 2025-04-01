@@ -60,7 +60,13 @@ jobs:
       - uses: aws-actions/amazon-ecr-login@v2
         id: login-ecr
 
-      - name: Build and push Docker image
+      - name: Create ECR repository if not exists
+        run: |
+          aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} || \
+          aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY }} || \
+          echo "Repository already exists, continuing..."
+
+      - name: Build&Push DockerImage
         working-directory: ./HackathonFiapCognitoAuth
         run: |
           VERSION_TAG=$(date +'%Y%m%d').${{ github.run_number }}
