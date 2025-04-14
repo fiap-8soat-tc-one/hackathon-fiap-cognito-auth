@@ -40,7 +40,7 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 
             InitiateAuthRequest authRequest = new InitiateAuthRequest()
                     .withAuthFlow(AuthFlowType.USER_PASSWORD_AUTH)
-                    .withClientId("aiikv53cphpca7r6plv0vilec")
+                    .withClientId("76sc7h5cv5nqb2onaav82522nb")
                     .withAuthParameters(authParams);
 
             InitiateAuthResult authResult = cognitoClient.initiateAuth(authRequest);
