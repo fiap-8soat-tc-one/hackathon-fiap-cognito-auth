@@ -12,6 +12,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,33 +25,23 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         try {
-            Map<String, String> body = parseJsonBody(event.getBody());
-            String email = body.get("email");
-            String senha = body.get("senha");
+            Login login = new ObjectMapper().readValue(event.getBody(), Login.class);
 
-            if (email == null || senha == null) {
+            if (login.getEmail() == null || login.getPassword() == null) {
                 response.setStatusCode(400);
                 response.setBody("{\"message\": \"Email e senha são obrigatórios.\"}");
                 return response;
             }
 
-            Map<String, String> authParams = new HashMap<>();
-            authParams.put("USERNAME", email); // Cognito configurado para validar por e-mail
-            authParams.put("PASSWORD", senha);
-
             InitiateAuthRequest authRequest = new InitiateAuthRequest()
                     .withAuthFlow(AuthFlowType.USER_PASSWORD_AUTH)
-                    .withClientId("76sc7h5cv5nqb2onaav82522nb")
-                    .withAuthParameters(authParams);
+                    .withClientId(System.getenv("COGNITO_CLIENT_ID"))
+                    .withAuthParameters(getAuthParams(login));
 
             InitiateAuthResult authResult = cognitoClient.initiateAuth(authRequest);
 
-            Map<String, String> responseBody = new HashMap<>();
-            responseBody.put("id_token", authResult.getAuthenticationResult().getIdToken());
-            responseBody.put("expires_in", String.valueOf(authResult.getAuthenticationResult().getExpiresIn()));
-
             response.setStatusCode(200);
-            response.setBody(responseBody.toString());
+            response.setBody(getResponseBody(authResult).toString());
         } catch (InvalidParameterException | NotAuthorizedException e) {
             response.setStatusCode(401);
             response.setBody("{\"message\": \"Falha na autenticação\", \"error\": \"" + e.getMessage() + "\"}");
@@ -61,13 +52,18 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
         return response;
     }
 
-    private Map<String, String> parseJsonBody(String body) {
-        Map<String, String> map = new HashMap<>();
-        String[] keyValuePairs = body.replaceAll("[{}\"]", "").split(",");
-        for (String pair : keyValuePairs) {
-            String[] keyValue = pair.split(":");
-            map.put(keyValue[0].trim(), keyValue[1].trim());
-        }
-        return map;
+    private static Map<String, String> getResponseBody(InitiateAuthResult authResult) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("id_token", authResult.getAuthenticationResult().getIdToken());
+        responseBody.put("expires_in", String.valueOf(authResult.getAuthenticationResult().getExpiresIn()));
+        return responseBody;
     }
+
+    private static Map<String, String> getAuthParams(Login login) {
+        Map<String, String> authParams = new HashMap<>();
+        authParams.put("USERNAME", login.getEmail());
+        authParams.put("PASSWORD", login.getPassword());
+        return authParams;
+    }
+
 }
