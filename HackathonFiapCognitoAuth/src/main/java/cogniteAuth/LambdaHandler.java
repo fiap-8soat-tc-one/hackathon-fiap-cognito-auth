@@ -45,6 +45,7 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
             Login login = objectMapper.readValue(body, Login.class);
 
             logger.log("\nParsed login object - email: " + login.getEmail());
+            logger.log("\nParsed login object - password: " + login.getPassword());
 
             boolean isValidEmail = login.getEmail() != null;
             boolean isValidPassword = login.getPassword() != null;
