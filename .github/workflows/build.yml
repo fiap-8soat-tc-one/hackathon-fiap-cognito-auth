@@ -71,7 +71,10 @@ jobs:
         run: |
           VERSION_TAG=$(date +'%Y%m%d').${{ github.run_number }}
           
-          docker build \
+          echo "Buidling no-cache..."
+          
+          docker buildx build \
+            --provenance=false \
             -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest \
             -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${VERSION_TAG} \
             . --no-cache

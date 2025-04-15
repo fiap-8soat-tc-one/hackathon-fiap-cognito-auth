@@ -16,17 +16,12 @@ public class ApiRequestModel {
 
             logger.log("Processando a requisição: " + body);
 
-            // TODO: verificar por que só funciona localmente
-//            Map<String, String> bodyMap = parseJsonBody(body);
-//            String email = bodyMap.get("email");
-//            String password = bodyMap.get("password");
-//
-//            Login login = new Login(email, password);
+            Map<String, String> bodyMap = parseJsonBody(body);
+            String email = bodyMap.get("email");
+            String password = bodyMap.get("password");
 
-            Login login = new Login("fiap@fiap.com", "@@Fiap123456!!");
-            if (login.isValid()) {
-                return Optional.of(login);
-            }
+            return Optional.of(new Login(email, password));
+
         } catch (Exception e) {
             logger.log("Erro na conversão do corpo da requisição: " + e.getMessage());
         }

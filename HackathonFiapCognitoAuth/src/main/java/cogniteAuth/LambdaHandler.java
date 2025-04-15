@@ -30,7 +30,7 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 
         LambdaLogger logger = context.getLogger();
         try {
-            Optional<Login> login = ApiRequestModel.parseLoginRequest(event,logger );
+            Optional<Login> login = ApiRequestModel.parseLoginRequest(event,logger);
 
             if (!login.isPresent()) {
                 return ApiResponseModel.createResponse(400, "Requisição inválida ou campos obrigatórios não preenchidos corretamente!");
