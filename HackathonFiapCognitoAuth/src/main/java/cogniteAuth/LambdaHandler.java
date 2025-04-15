@@ -24,11 +24,17 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         try {
-            Login login = new ObjectMapper().readValue(event.getBody(), Login.class);
+            String body = event.getBody();
+
+            if(event.getIsBase64Encoded()) {
+                body = new String(java.util.Base64.getDecoder().decode(body));
+            }
+
+            Login login = new ObjectMapper().readValue(body, Login.class);
 
             if (login.getEmail() == null || login.getPassword() == null) {
                 response.setStatusCode(400);
-                response.setBody("{\"message\": \"Email e senha são obrigatórios.\"}");
+                response.setBody("{\"message\": \"Email e password são obrigatórios.\"}");
                 return response;
             }
 
