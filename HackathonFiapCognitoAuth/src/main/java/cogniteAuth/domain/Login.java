@@ -18,15 +18,6 @@ public class Login {
         return password;
     }
 
-
-    public String setEmail(String email) {
-        return email;
-    }
-
-    public String setPassword(String password) {
-        return password;
-    }
-
     public boolean isValid() {
         return email != null && password != null;
     }

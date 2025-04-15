@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ApiRequestModel {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
     public static Optional<Login> parseLoginRequest(APIGatewayProxyRequestEvent event, LambdaLogger logger) {
         try {
             String body = event.getBody();
