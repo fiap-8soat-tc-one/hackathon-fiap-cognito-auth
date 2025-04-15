@@ -23,9 +23,9 @@ public class AuthenticationServiceImp implements AuthenticationService {
     public Map<String, String> authenticate(Login login, LambdaLogger  logger) throws AuthenticationException {
         try {
 
-            logger.log("Autênticando usuário: " + login.getEmail());
+            logger.log("\nAutênticando usuário: " + login.getEmail());
             InitiateAuthResult authResult = cognitoClient.initiateAuth(createAuthRequest(login));
-            logger.log("Usuário autenticado com sucesso: " + login.getEmail());
+            logger.log("\nUsuário autenticado com sucesso: " + login.getEmail());
             return createAuthResponse(authResult);
         } catch (NotAuthorizedException | InvalidParameterException e) {
             throw new AuthenticationException("Autênticação falhou: " + e.getMessage(), 401);
