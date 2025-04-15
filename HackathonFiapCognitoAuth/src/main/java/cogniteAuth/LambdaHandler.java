@@ -36,7 +36,7 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
                 return ApiResponseModel.createResponse(400, "Requisição inválida ou campos obrigatórios não preenchidos corretamente!");
             }
 
-            return ApiResponseModel.createResponse(200, authService.authenticate(login.get()));
+            return ApiResponseModel.createResponse(200, authService.authenticate(login.get(), logger));
 
         } catch (AuthenticationException e) {
             return ApiResponseModel.createResponse(e.getStatusCode(), e.getMessage());

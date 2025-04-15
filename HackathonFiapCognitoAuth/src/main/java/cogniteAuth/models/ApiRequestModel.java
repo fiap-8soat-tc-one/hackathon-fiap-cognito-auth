@@ -16,11 +16,13 @@ public class ApiRequestModel {
 
             logger.log("Processando a requisição: " + body);
 
-            Map<String, String> bodyMap = parseJsonBody(body);
-            String email = bodyMap.get("email");
-            String password = bodyMap.get("password");
+//            Map<String, String> bodyMap = parseJsonBody(body);
+//            String email = bodyMap.get("email");
+//            String password = bodyMap.get("password");
 
-            return Optional.of(new Login(email, password));
+            logger.log("Requisição processada: " + body);
+
+            return Optional.of( new ObjectMapper().readValue(body, Login.class));
 
         } catch (Exception e) {
             logger.log("Erro na conversão do corpo da requisição: " + e.getMessage());
