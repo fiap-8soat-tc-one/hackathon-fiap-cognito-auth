@@ -71,9 +71,7 @@ jobs:
         run: |
           VERSION_TAG=$(date +'%Y%m%d').${{ github.run_number }}
           
-          docker buildx build \
-            --platform linux/amd64 \
-            --provenance=false \
+          docker build \
             -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest \
             -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${VERSION_TAG} \
             .
