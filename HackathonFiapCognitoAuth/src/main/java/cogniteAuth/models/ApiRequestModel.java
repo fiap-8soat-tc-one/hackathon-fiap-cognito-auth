@@ -16,7 +16,7 @@ public class ApiRequestModel {
         try {
             String body = event.getBody();
 
-            logger.log("Processing body: " + body);
+            logger.log("Processando a requisição: " + body);
 
             Map<String, String> bodyMap = parseJsonBody(body);
             String email = bodyMap.get("email");
@@ -28,7 +28,7 @@ public class ApiRequestModel {
                 return Optional.of(login);
             }
         } catch (Exception e) {
-            logger.log("Error parsing body: " + e.getMessage());
+            logger.log("Erro na conversão do corpo da requisição: " + e.getMessage());
         }
         return Optional.empty();
     }

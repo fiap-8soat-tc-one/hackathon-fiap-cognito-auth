@@ -24,9 +24,9 @@ public class AuthenticationServiceImp implements AuthenticationService {
             InitiateAuthResult authResult = cognitoClient.initiateAuth(createAuthRequest(login));
             return createAuthResponse(authResult);
         } catch (NotAuthorizedException | InvalidParameterException e) {
-            throw new AuthenticationException("Authentication failed: " + e.getMessage(), 401);
+            throw new AuthenticationException("Autênticação falhou: " + e.getMessage(), 401);
         } catch (Exception e) {
-            throw new AuthenticationException("Internal authentication error", 500);
+            throw new AuthenticationException("Erro ao Autênticar!", 500);
         }
     }
 

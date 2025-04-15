@@ -15,7 +15,7 @@ public class ApiResponseModel {
             String body = objectMapper.writeValueAsString(Map.of("message", message));
             return response.withStatusCode(statusCode).withBody(body);
         } catch (Exception e) {
-            return response.withStatusCode(500).withBody("{\"message\":\"Error creating response\"}");
+            return response.withStatusCode(500).withBody("{\"message\":\"Erro interno!\"}");
         }
     }
 
@@ -26,7 +26,7 @@ public class ApiResponseModel {
         try {
             return response.withStatusCode(statusCode).withBody(objectMapper.writeValueAsString(body));
         } catch (Exception e) {
-            return response.withStatusCode(500).withBody("{\"message\":\"Error creating response\"}");
+            return response.withStatusCode(500).withBody("{\"message\":\"Erro interno!\"}");
         }
     }
 }

@@ -8,6 +8,7 @@ import cogniteAuth.services.AuthenticationException;
 import cogniteAuth.services.AuthenticationService;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProviderClientBuilder;
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
@@ -26,11 +27,13 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
+
+        LambdaLogger logger = context.getLogger();
         try {
-            Optional<Login> login = ApiRequestModel.parseLoginRequest(event, context.getLogger());
+            Optional<Login> login = ApiRequestModel.parseLoginRequest(event,logger );
 
             if (!login.isPresent()) {
-                return ApiResponseModel.createResponse(400, "Invalid request body or missing required fields");
+                return ApiResponseModel.createResponse(400, "Requisição inválida ou campos obrigatórios não preenchidos corretamente!");
             }
 
             return ApiResponseModel.createResponse(200, authService.authenticate(login.get()));
@@ -38,8 +41,8 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
         } catch (AuthenticationException e) {
             return ApiResponseModel.createResponse(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            context.getLogger().log("Error processing request: " + e.getMessage());
-            return ApiResponseModel.createResponse(500, "Internal server error");
+            logger.log("Erro interno ao processar requisição: " + e.getMessage());
+            return ApiResponseModel.createResponse(500, "Erro interno do servidor!");
         }
     }
 }
