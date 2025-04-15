@@ -30,13 +30,13 @@ public class ApiRequestModel {
         return Optional.empty();
     }
 
-    private static Map<String, String> parseJsonBody(String body) {
-        Map<String, String> map = new HashMap<>();
-        String[] keyValuePairs = body.replaceAll("[{}\"]", "").split(",");
-        for (String pair : keyValuePairs) {
-            String[] keyValue = pair.split(":");
-            map.put(keyValue[0].trim(), keyValue[1].trim());
-        }
-        return map;
-    }
+//    private static Map<String, String> parseJsonBody(String body) {
+//        Map<String, String> map = new HashMap<>();
+//        String[] keyValuePairs = body.replaceAll("[{}\"]", "").split(",");
+//        for (String pair : keyValuePairs) {
+//            String[] keyValue = pair.split(":");
+//            map.put(keyValue[0].trim(), keyValue[1].trim());
+//        }
+//        return map;
+//    }
 }
