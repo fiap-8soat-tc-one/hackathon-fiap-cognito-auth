@@ -5,7 +5,7 @@
     <artifactId>HackathonFiapCognitoAuth</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
-    <name>HackathonFiapCognitoAuth</name>
+    <name>hackathon-fiap-cognito-auth</name>
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
