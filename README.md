@@ -4,166 +4,180 @@
 [![Build and Publish image to ECR](https://github.com/fiap-8soat-tc-one/hackathon-fiap-cognito-auth/actions/workflows/build.yml/badge.svg)](https://github.com/fiap-8soat-tc-one/hackathon-fiap-cognito-auth/actions/workflows/build.yml)
 
 ## 📘 Visão Geral
-Este repositório contém uma função AWS Lambda escrita em **Java**, empacotada com **Docker**, que gerencia autenticação de usuários usando **Amazon Cognito**.
+Este repositório contém uma função AWS Lambda desenvolvida em Java 21, que implementa autenticação de usuários utilizando Amazon Cognito. O projeto é empacotado com Docker e implantado através do AWS SAM (Serverless Application Model).
 
-Essa função é usada no contexto do Hackaton da FIAP para viabilizar autenticação e autorização segura de usuários. A Lambda é exposta por meio do **API Gateway**, permitindo que frontends ou clientes autentiquem usuários de forma segura e escalável.
+## 🔨 Tecnologias Utilizadas
 
----
+- **Java 21**: Linguagem principal
+- **Maven**: Gerenciamento de dependências e build
+- **AWS Lambda**: Computação serverless
+- **Amazon Cognito**: Serviço de autenticação
+- **Docker**: Containerização
+- **AWS SAM**: Framework serverless
+- **GitHub Actions**: CI/CD
+- **SonarCloud**: Análise de qualidade de código
 
-## 🔐 Por que usar Autenticação com Cognito?
+## 📦 Estrutura do Projeto
 
-O **Amazon Cognito** oferece um serviço robusto de autenticação com:
-
-- ✅ **Segurança**: Autenticação e autorização com padrões da indústria
-- ✅ **Escalabilidade**: Gerencia milhões de usuários com gestão integrada
-- ✅ **Flexibilidade**: Suporta múltiplos fluxos de autenticação e provedores de identidade
-- ✅ **Conformidade**: Ajuda a atender requisitos de segurança e privacidade
-
----
-
-## ☕ Por que usar Java na Lambda?
-
-Embora a AWS Lambda suporte múltiplas linguagens, o Java traz os seguintes benefícios:
-
-- 🔒 **Tipagem forte**: Menor risco de erros em tempo de execução
-- 🧰 **Ecossistema maduro**: Acesso a bibliotecas corporativas e ferramentas como Maven e Spring
-- ⚙️ **Performance consistente**: Especialmente útil em workloads computacionais mais pesados
-- 📦 **Empacotamento com Docker**: Evita problemas de cold start e permite melhor controle do ambiente
-
----
-
-## 🐳 Vantagens de rodar Lambda com Docker
-
-- 📦 **Ambiente personalizado**: Controle total sobre bibliotecas, runtime e dependências
-- 💼 **Adoção corporativa**: Ideal para equipes que já utilizam Java e Docker
-- 🧪 **Testabilidade**: Pode ser testado localmente com `sam local` ou `docker run`
-- 🔁 **Portabilidade**: O mesmo container pode ser usado em outros ambientes (ECS, Fargate, etc)
-
----
-
-## 🧪 Estrutura do Projeto
-
-```bash
-.
-└── HackatonFiapCognitoAuth/
-    └── src/
-        └── Dockerfile               # Define imagem Java 21 com Lambda
-        └── pom.xml                 # Build Maven com dependências AWS
-        └── main/java/auth/
-            └── LambdaHandler.java  # Código Java principal
-
----
-
-## 🔄 Fluxo de Funcionamento
-
-1. O frontend faz uma requisição HTTP POST ao endpoint da Lambda via API Gateway.
-2. A Lambda valida credenciais contra o pool de usuários do Cognito
-3. Se bem-sucedido, retorna o JWT
-
-
----
-
-## 📎 Exemplo de Resposta JSON
-```json
-{
-  "AccessToken": "eyJz9sdfn....",
-  "IdToken": "eyJ0eXAiOi...",
-  "RefreshToken": "eyJjdHkiOi...",
-  "ExpiresIn": 3600
-}
+```
+hackathon-fiap-cognito-auth/
+├── .github/workflows/           # Pipeline de CI/CD
+├── HackathonFiapCognitoAuth/   # Código fonte principal
+│   ├── src/
+│   │   ├── main/java/cogniteAuth/
+│   │   │   ├── domain/         # Classes de domínio
+│   │   │   ├── infrastructure/ # Implementações de serviços
+│   │   │   ├── models/        # Classes de modelo
+│   │   │   └── services/      # Interfaces de serviço
+│   ├── Dockerfile             # Configuração do container
+│   └── pom.xml               # Configuração Maven
+├── template.yaml             # Template SAM
+└── setup.sh                 # Script de setup do ECR
 ```
 
----
+## 🏗️ Arquitetura do Projeto
 
-## 🧰 O que é o AWS SAM?
-
-O **AWS Serverless Application Model (SAM)** é uma ferramenta open-source da AWS que facilita o desenvolvimento, teste e deployment de aplicações serverless. Ele permite definir a infraestrutura como código (IaC) com uma sintaxe simplificada baseada em CloudFormation e executar Lambdas localmente com Docker.
-
-### 📌 Vantagens do SAM
-- Criação de APIs, Lambdas, DynamoDB, S3 e outros recursos com poucas linhas de YAML
-- Permite **testes locais** com `sam local invoke` e `sam local start-api`
-- Deploy simplificado com `sam deploy`
-- Integração com CI/CD e outras ferramentas AWS
-
-### 🧪 Instalação do SAM
-```bash
-# No macOS (Homebrew)
-brew tap aws/tap
-brew install aws-sam-cli
-
-# No Ubuntu/Linux
-curl -Lo sam-install.sh https://github.com/aws/aws-sam-cli/releases/latest/download/install
-chmod +x sam-install.sh && ./sam-install.sh
-
-# Verifique a instalação
-sam --version
+### Diagrama de Classes
+```mermaid
+classDiagram
+    class LambdaHandler {
+        -AuthenticationService authService
+        +handleRequest(event, context)
+    }
+    class Login {
+        -String email
+        -String password
+        +getEmail()
+        +getPassword()
+    }
+    class AuthenticationService {
+        <<interface>>
+        +authenticate(login, logger)
+    }
+    class AuthenticationServiceImp {
+        -AWSCognitoIdentityProvider cognitoClient
+        -String clientId
+        +authenticate(login, logger)
+    }
+    class ApiRequestModel {
+        +parseLoginRequest(event, logger)
+    }
+    class ApiResponseModel {
+        +createResponse(statusCode, message)
+        +createResponse(statusCode, body)
+    }
+    
+    LambdaHandler --> AuthenticationService
+    AuthenticationService <|.. AuthenticationServiceImp
+    AuthenticationServiceImp ..> Login
+    ApiRequestModel ..> Login
+    LambdaHandler ..> ApiRequestModel
+    LambdaHandler ..> ApiResponseModel
 ```
 
-### ▶️ Rodando a aplicação localmente
-```bash
-# Build do projeto (compila e prepara Docker)
-sam build
+### 🔄 Fluxo da Aplicação
 
-# Executa a API localmente (via API Gateway emulado)
-sam local start-api
+1. **Requisição HTTP (POST)**
+   - Cliente envia requisição para API Gateway
+   - Payload: `{"email": "user@example.com", "password": "senha"}`
 
-# Testa função individual com evento de entrada
-sam local invoke "LambdaHandler"
+2. **Processamento Lambda**
+   ```mermaid
+   sequenceDiagram
+       Client->>API Gateway: POST /auth
+       API Gateway->>Lambda: Invoke
+       Lambda->>Cognito: InitiateAuth
+       Cognito-->>Lambda: AuthResult
+       Lambda-->>API Gateway: Response
+       API Gateway-->>Client: JWT Tokens
+   ```
+
+3. **Resposta**
+   ```json
+   {
+     "id_token": "eyJhbG...",
+     "expires_in": "3600"
+   }
+   ```
+
+## ⚙️ Configurações
+
+### Variáveis de Ambiente
+- `COGNITO_CLIENT_ID`: ID do cliente Cognito (Obrigatório)
+
+### Recursos AWS SAM
+```yaml
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: java21
+      Handler: cogniteAuth.LambdaHandler
+      MemorySize: 128
+      Timeout: 300
 ```
 
----
+## 🚀 Como Executar
 
-## 🐳 O que é Docker?
-
-**Docker** é uma plataforma para desenvolver, empacotar e executar aplicações em contêineres. Ele permite isolar a aplicação do sistema operacional do host, garantindo consistência entre ambientes de desenvolvimento e produção.
-
-### 🔧 Por que usar Docker com Lambda
-- Facilita testes locais
-- Evita problemas de ambiente/desempenho
-- Permite empacotar dependências nativas e bibliotecas Java
-- Possibilita simular exatamente o ambiente da AWS
-
-### 💻 Como instalar o Docker
-
-#### Windows ou macOS
-- Baixe e instale pelo site oficial: [https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
-
-#### Ubuntu Linux
-```bash
-sudo apt update
-sudo apt install docker.io -y
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo usermod -aG docker $USER
-```
-(⚠️ Faça logout/login após rodar `usermod`)
-
-### ▶️ Rodar Lambda manualmente com Docker
-```bash
-# Build da imagem localmente
-docker build -t lambda-java-presigned-url .
-
-# Executa a função Lambda local com entrada via stdin
-echo '{}' | docker run -i lambda-java-presigned-url
-```
-
----
-
-## ✅ Requisitos
+### Pré-requisitos
+- JDK 21
+- Maven
+- Docker
 - AWS CLI configurado
-- Docker instalado
-- AWS SAM CLI para build e deploy (opcional)
+- AWS SAM CLI
 
----
-
-## 🚀 Deploy com SAM
+### Build Local
 ```bash
+# Build do projeto
+mvn clean package
+
+# Build da imagem Docker
+docker build -t auth-lambda .
+
+# Executar localmente
+sam local start-api
+```
+
+### Deploy
+```bash
+# Build SAM
 sam build
+
+# Deploy na AWS
 sam deploy --guided
 ```
 
----
+## 🔍 Monitoramento e Logs
 
-## ✉️ Contato
+A aplicação utiliza CloudWatch para logging e monitoramento. Os logs incluem:
+- Tentativas de autenticação
+- Erros de autenticação
+- Métricas de performance
+
+## 🛡️ Segurança
+
+- Autenticação via Amazon Cognito
+- Tokens JWT com expiração configurável
+- HTTPS/TLS para todas as comunicações
+- Secrets gerenciados via AWS Secrets Manager
+
+## 📊 Qualidade de Código
+
+O projeto utiliza SonarCloud para garantir:
+- Cobertura de testes
+- Análise estática de código
+- Detecção de vulnerabilidades
+- Métricas de qualidade
+
+## 🤝 Contribuindo
+
+1. Fork o projeto
+2. Crie uma branch (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## ✉️ Suporte
+
 Para dúvidas ou sugestões, entre em contato com o time técnico responsável pelo Hackaton FIAP.
 
